@@ -10,17 +10,17 @@
     <h4>Image</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Link)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Link)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
         </dd>
         <dt class="col-sm-2">
             Image
         </dt>
         <dd class="col-sm-10">
-            <img src="@Html.DisplayFor(model => model.Link)" style="max-width: 150px;"/>
+            <img src="data:image/png;base64,@Html.DisplayFor(model => model.Link)" style="max-width: 150px;" />
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.CreatedAt)

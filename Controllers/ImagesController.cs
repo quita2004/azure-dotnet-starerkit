@@ -2,28 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApplicationMVC.Models;
+using WebApplicationMVC.Provider.Azure;
 
 namespace WebApplicationMVC.Controllers
 {
     public class ImagesController : Controller
     {
         private readonly DemoCrudContext _context;
+        private readonly IConfiguration _configuration;
 
-        public ImagesController(DemoCrudContext context)
+        public ImagesController(DemoCrudContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: Images
         public async Task<IActionResult> Index()
         {
-              return _context.Images != null ? 
-                          View(await _context.Images.ToListAsync()) :
-                          Problem("Entity set 'DemoCrudContext.Images'  is null.");
+            return _context.Images != null ?
+                        View(await _context.Images.ToListAsync()) :
+                        Problem("Entity set 'DemoCrudContext.Images'  is null.");
         }
 
         // GET: Images/Details/5
@@ -41,6 +46,8 @@ namespace WebApplicationMVC.Controllers
                 return NotFound();
             }
 
+            image.Link = await AzureProvider.DownloadBase64FromAzureBlob(_configuration, image.Name);
+
             return View(image);
         }
 
@@ -55,7 +62,7 @@ namespace WebApplicationMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Link,CreatedAt")] Image image)
+        public async Task<IActionResult> Create([Bind("Id,Link,Name,CreatedAt")] Image image)
         {
             if (ModelState.IsValid)
             {
@@ -87,7 +94,7 @@ namespace WebApplicationMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Link,CreatedAt")] Image image)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Link,Name,CreatedAt")] Image image)
         {
             if (id != image.Id)
             {
@@ -149,14 +156,14 @@ namespace WebApplicationMVC.Controllers
             {
                 _context.Images.Remove(image);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ImageExists(int id)
         {
-          return (_context.Images?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Images?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

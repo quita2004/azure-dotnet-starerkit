@@ -37,6 +37,9 @@ public partial class DemoCrudContext : DbContext
             entity.Property(e => e.Link)
                 .HasMaxLength(255)
                 .IsFixedLength();
+            entity.Property(e => e.Name)
+                .HasMaxLength(255)
+                .IsFixedLength();
         });
 
         modelBuilder.Entity<Student>(entity =>
